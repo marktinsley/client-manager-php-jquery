@@ -2,7 +2,8 @@
 
 namespace Project\Routing;
 
-use Project\View;
+use Project\Response\Redirect;
+use Project\Response\View;
 
 class FrontController
 {
@@ -29,19 +30,23 @@ class FrontController
         try {
             $response = $this->buildResponse();
         } catch (CouldNotResolveRouteException $e) {
-            header('HTTP/1.0 404 Not Found');
-            die("Could not find page.");
+            $this->outputNotFound();
         }
 
-        if ($response instanceof View) {
-            header('Content-Type: application/json');
-            echo $response->render();
+        if ($response instanceof Redirect) {
+            $this->redirect($response);
+        } else if ($response instanceof View) {
+            $this->outputView($response);
         }
 
-        header('Content-Type: application/json');
-        echo json_encode($response);
+        $this->outputJson($response);
     }
 
+    /**
+     * Build the response.
+     *
+     * @return mixed
+     */
     public function buildResponse()
     {
         $handler = $this->resolveHandler();
@@ -68,8 +73,52 @@ class FrontController
 
         $pathParts = array_map($toStudlyCase, $this->request->pathParts());
 
-        $result = 'Project\Handlers\\' . implode('\\', $pathParts);
+        $result = rtrim('Project\Handlers\\' . implode('\\', $pathParts), '\\');
 
         return $result . (class_exists($result) ? '' : '\Index');
+    }
+
+    /**
+     * Redirect to another uri.
+     *
+     * @param $response
+     */
+    protected function redirect(Redirect $response)
+    {
+        header('Location: ' . $response->to());
+        exit;
+    }
+
+    /**
+     * Output a view.
+     *
+     * @param $response
+     */
+    protected function outputView(View $response)
+    {
+        header('Content-Type: text/html');
+        echo $response->render();
+        exit;
+    }
+
+    /**
+     * Output response as json.
+     *
+     * @param $response
+     */
+    protected function outputJson($response)
+    {
+        header('Content-Type: application/json');
+        echo json_encode($response);
+        exit;
+    }
+
+    /**
+     * Output 404, not found.
+     */
+    protected function outputNotFound()
+    {
+        header('HTTP/1.0 404 Not Found');
+        exit("Could not find page.");
     }
 }

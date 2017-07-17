@@ -11,6 +11,8 @@ class Request
      */
     private $uri;
 
+    private $method;
+
     /**
      * The params for this request.
      *
@@ -22,11 +24,13 @@ class Request
      * Constructor.
      *
      * @param string $uri
+     * @param string $method
      * @param array $params
      */
-    public function __construct(string $uri, array $params)
+    public function __construct($uri, $method, array $params)
     {
         $this->uri = $uri;
+        $this->method = strtoupper($method);
         $this->params = $params;
     }
 
@@ -62,13 +66,23 @@ class Request
 
     /**
      * Gives you the value of a param and null if param wasn't provided.
-     * 
+     *
      * @param $name
-     * 
+     *
      * @return mixed|null
      */
     public function param($name)
     {
         return isset($this->params[$name]) ? $this->params[$name] : null;
+    }
+
+    /**
+     * The request method.
+     *
+     * @return string
+     */
+    public function method()
+    {
+        return $this->method;
     }
 }

@@ -4,8 +4,10 @@
   },
   "autoload": {
     "psr-4": {
-      "Project\\": "project/",
-      "Tests\\": "tests/"
+      "Project\\": "project/"
     }
+  },
+  "require": {
+    "aura/session": "^2.1"
   }
 }

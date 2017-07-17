@@ -1,8 +1,10 @@
 <?php
 
-namespace Project;
+namespace Project\Response;
 
-class View
+use Project\Contracts\Response;
+
+class View implements Response
 {
     private $viewData;
     private $path;
@@ -54,6 +56,6 @@ class View
      */
     public function resolvePath()
     {
-        return __DIR__ . '/../views/' . str_replace('.', '/', $this->path) . '.php';
+        return __DIR__ . '/../../views/' . str_replace('.', '/', $this->path) . '.php';
     }
 }
