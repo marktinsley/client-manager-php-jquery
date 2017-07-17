@@ -2,6 +2,7 @@
 
 namespace Project\Routing;
 
+use Project\Response\Failure;
 use Project\Response\Redirect;
 use Project\Response\View;
 
@@ -33,7 +34,9 @@ class FrontController
             $this->outputNotFound();
         }
 
-        if ($response instanceof Redirect) {
+        if ($response instanceof Failure) {
+            $this->outputFailure($response);
+        } else if ($response instanceof Redirect) {
             $this->redirect($response);
         } else if ($response instanceof View) {
             $this->outputView($response);
@@ -118,7 +121,18 @@ class FrontController
      */
     protected function outputNotFound()
     {
-        header('HTTP/1.0 404 Not Found');
+        http_response_code(404);
         exit("Could not find page.");
+    }
+
+    /**
+     * Output a failure.
+     *
+     * @param Failure $failure
+     */
+    protected function outputFailure(Failure $failure)
+    {
+        http_response_code($failure->getHttpCode());
+        exit($failure->getMessage());
     }
 }

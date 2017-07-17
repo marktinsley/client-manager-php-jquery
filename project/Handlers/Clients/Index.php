@@ -2,6 +2,7 @@
 
 namespace Project\Handlers\Clients;
 
+use Project\Databases\Connection;
 use Project\Handlers\BaseHandler;
 use Project\Response\Redirect;
 use Project\Response\View;
@@ -11,6 +12,7 @@ use Project\User\Auth;
 
 class Index extends BaseHandler
 {
+    protected $db;
     protected $session;
     protected $auth;
 
@@ -23,6 +25,7 @@ class Index extends BaseHandler
     {
         parent::__construct($request);
 
+        $this->db = Connection::getInstance();
         $this->session = Session::getInstance();
         $this->auth = new Auth();
     }
@@ -38,10 +41,9 @@ class Index extends BaseHandler
             return new Redirect('/login');
         }
 
-        return (new View('clients.index'))
-            ->with($this->session->getFlashedMessage() + [
-                    'isLoggedIn' => $this->auth->isLoggedIn(),
-                    'list' => 'testestsetse',
-                ]);
+        return (new View('clients.index'))->with(
+            $this->session->getFlashedMessage() + [
+                'isLoggedIn' => $this->auth->isLoggedIn(),
+            ]);
     }
 }
